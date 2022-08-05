@@ -1,11 +1,13 @@
 /* add home page styles here */
 .grid {
+    position: absolute;
     height: 300px;
     width: 600px;
     border: 3px solid lightseagreen;
 }
 
 .block {
+    position: absolute;
     height: 20px;
     width: 100px;
     background-color: rgb(222, 39, 69);
