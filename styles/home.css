@@ -1,21 +1,28 @@
-/* add home page styles here */
 .grid {
     position: absolute;
     height: 300px;
     width: 560px;
-    border: 3px solid lightseagreen;
+    border: 3px solid darkcyan;
 }
 
 .block {
     position: absolute;
     height: 20px;
     width: 100px;
-    background-color: rgb(222, 39, 69);
+    background-color: rebeccapurple;
 }
 
 .user {
     position: absolute;
     height: 20px;
     width: 100px;
-    background-color: darkolivegreen;
+    background-color: darkorange;
+}
+
+.ball {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    background-color: dodgerblue;
 }
