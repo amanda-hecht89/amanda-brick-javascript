@@ -2,6 +2,7 @@ const grid = document.querySelector('.grid');
 const blockWidth = 100;
 const blockHeight = 20;
 const boardWidth = 560;
+let timerId;
 
 const userStart = [230, 10];
 let currentPosition = userStart;
@@ -63,6 +64,11 @@ function drawUser() {
     user.style.bottom = currentPosition[1] + 'px';
 }
 
+function drawBall() {
+    ball.style.right = ballCurrentPosition[0] + 'px';
+    ball.style.bottom = ballCurrentPosition[1] + 'px';
+}
+
 // move user
 function moveUser(e) {
     switch (e.key) {
@@ -83,6 +89,13 @@ document.addEventListener('keydown', moveUser);
 
 const ball = document.createElement('div');
 ball.classList.add('ball');
-ball.style.right = ballCurrentPosition[0] + 'px';
-ball.style.bottom = ballCurrentPosition[1] + 'px';
+drawBall();
 grid.appendChild(ball);
+
+function moveBall() {
+    ballCurrentPosition[0] += 2;
+    ballCurrentPosition[1] += 2;
+    drawBall();
+}
+
+timerId = setInterval(moveBall, 30);
