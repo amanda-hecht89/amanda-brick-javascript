@@ -3,6 +3,11 @@ const blockWidth = 100;
 const blockHeight = 20;
 const boardWidth = 560;
 let timerId;
+let ballDia = 20;
+let yDirection = 2;
+let xDirection = 2;
+const boardHeight = 300;
+const scoreDisplay = document.querySelector('.score');
 
 const userStart = [230, 10];
 let currentPosition = userStart;
@@ -65,7 +70,7 @@ function drawUser() {
 }
 
 function drawBall() {
-    ball.style.right = ballCurrentPosition[0] + 'px';
+    ball.style.left = ballCurrentPosition[0] + 'px';
     ball.style.bottom = ballCurrentPosition[1] + 'px';
 }
 
@@ -93,9 +98,43 @@ drawBall();
 grid.appendChild(ball);
 
 function moveBall() {
-    ballCurrentPosition[0] += 2;
-    ballCurrentPosition[1] += 2;
+    ballCurrentPosition[0] += xDirection;
+    ballCurrentPosition[1] += yDirection;
     drawBall();
+    checkForCollisions();
 }
 
 timerId = setInterval(moveBall, 30);
+
+
+function checkForCollisions() {
+    if (ballCurrentPosition[0] >= (boardWidth - ballDia) || 
+    ballCurrentPosition[1] >= (boardHeight - ballDia) || 
+    ballCurrentPosition[0] <= 0) {
+        changeDirection();
+    }
+    if (ballCurrentPosition[1] <= 0) {
+        clearInterval(timerId);
+        scoreDisplay.innerHTML = 'you lose';
+        document.removeEventListener('keydown', moveUser);
+    
+    }
+}
+
+
+
+function changeDirection() {
+    if (xDirection === 2 && yDirection === 2) {
+        yDirection = -2;
+        return;
+    } if (xDirection === 2 && yDirection === -2) {
+        xDirection = -2;
+        return;
+    } if (xDirection === -2 && yDirection === -2) {
+        yDirection = 2;
+        return;
+    } if (xDirection === -2 && yDirection === 2) {
+        xDirection = 2;
+        return;
+    }
+}
