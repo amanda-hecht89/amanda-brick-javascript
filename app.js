@@ -1,69 +1,173 @@
-// import functions and grab DOM elements
-const form = document.getElementById('ingredient-list');
-const remove = document.getElementById('remove');
-const listedingredients = document.getElementById('listed');
-const save = document.getElementById('meal-button');
-const meal = document.getElementById('recipe-name');
-const history = document.getElementById('history');
+const grid = document.querySelector('.grid'); 
+const blockWidth = 100;
+const blockHeight = 20;
+const boardWidth = 560;
+let timerId;
+let ballDia = 20;
+let yDirection = 2;
+let xDirection = 2;
+const boardHeight = 300;
+const scoreDisplay = document.querySelector('.score');
+let score = 0;
 
-import { renderIngredient } from './utils.js';
-import { renderSoloMeal } from './utils.js';
+const userStart = [230, 10];
+let currentPosition = userStart;
 
-// let state
-let mealsArray = [];
-let totalstuff = [];
-
-// set event listeners 
-  // get user input
-  // use user input to update state 
-  // update DOM to reflect the new state
-form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const totalList = new FormData(form);
-
-    let ingredients = {
-        name: totalList.get('food'),
-        quantity: totalList.get('amount'),
-        measurement: totalList.get('measure'),
-    };
-    totalstuff.push(ingredients);
+const ballStart = [270, 40];
+let ballCurrentPosition = ballStart;
 
 
-    displayingredients();
-    //form.reset();
-});
 
-remove.addEventListener('click', () => {
-    totalstuff.pop();
-    displayingredients();
-});
-
-function displayingredients() {
-    listedingredients.textContent = '';
-    for (let list of totalstuff) {
-        const li = renderIngredient(list);
-        listedingredients.appendChild(li);
+class Block {
+    constructor(xAxis, yAxis) {
+        this.bottomLeft = [xAxis, yAxis];
+        this.bottomRight = [xAxis + blockWidth, yAxis];
+        this.topLeft = [xAxis, yAxis + blockHeight];
+        this.topRight = [xAxis + blockWidth, yAxis + blockHeight];
     }
 }
-//function resetIngredients() {
-  //  totalstuff = [];
-    //listedingredients.textcontent = '';
-//}
 
-save.addEventListener('click', () => {
-    const mealName = meal.value;
-    const ingredcount = totalstuff.length;
-    mealsArray.push({ mealName, ingredcount });
-    renderMeals();
-    console.log(renderMeals);
-    console.log(mealsArray);
-});
+const blocks = [
+    new Block(10, 270),
+    new Block(120, 270),
+    new Block(230, 270),
+    new Block(340, 270),
+    new Block(450, 270),
+    new Block(10, 240),
+    new Block(120, 240),
+    new Block(230, 240),
+    new Block(340, 240),
+    new Block(450, 240),
+    new Block(10, 210),
+    new Block(120, 210),
+    new Block(230, 210),
+    new Block(340, 210),
+    new Block(450, 210)
 
-function renderMeals() {
-    history.textContent = '';
-    for (let meal of mealsArray) {
-        const li = renderSoloMeal(meal);
-        history.append(li);
+];
+
+
+function addBlocks() {
+    for (let i = 0; i < blocks.length; i++) {
+        const block = document.createElement('div');
+        block.classList.add('block');
+        block.style.left = blocks[i].bottomLeft[0] + 'px';
+        block.style.bottom = blocks[i].bottomLeft[1] + 'px';
+        grid.appendChild(block);
     }
 }
-//name="recipe" id="recipe-name"/>
+addBlocks();
+
+// add user
+const user = document.createElement('div');
+user.classList.add('user');
+drawUser();
+grid.appendChild(user);
+
+
+function drawUser() {
+    user.style.left = currentPosition[0] + 'px';
+    user.style.bottom = currentPosition[1] + 'px';
+}
+
+function drawBall() {
+    ball.style.left = ballCurrentPosition[0] + 'px';
+    ball.style.bottom = ballCurrentPosition[1] + 'px';
+}
+
+// move user
+function moveUser(e) {
+    switch (e.key) {
+        case 'ArrowLeft':
+            if (currentPosition[0] > 0) {
+                currentPosition[0] -= 10;
+                drawUser();
+            }
+            break;
+        case 'ArrowRight':
+            if (currentPosition[0] < boardWidth - blockWidth) {
+                currentPosition[0] += 10;
+                drawUser();
+            }
+            break;
+    }}
+document.addEventListener('keydown', moveUser);
+
+const ball = document.createElement('div');
+ball.classList.add('ball');
+drawBall();
+grid.appendChild(ball);
+
+function moveBall() {
+    ballCurrentPosition[0] += xDirection;
+    ballCurrentPosition[1] += yDirection;
+    drawBall();
+    checkForCollisions();
+}
+
+timerId = setInterval(moveBall, 30);
+
+
+function checkForCollisions() {
+
+    for (let i = 0; i < blocks.length; i++) {
+        if (
+            (ballCurrentPosition[0] > blocks[i].bottomLeft[0] && ballCurrentPosition[0] < blocks[i].bottomRight[0]) &&
+            ((ballCurrentPosition[1] + ballDia) > blocks[i].bottomLeft[1] && ballCurrentPosition[1] < blocks[i].topLeft[1])
+        ) {
+            const allBlocks = Array.from(document.querySelectorAll('.block'));
+            allBlocks[i].classList.remove('block');
+            blocks.splice(i, 1);
+            changeDirection();
+            score++;
+            scoreDisplay.innerHTML = score;
+
+            if (blocks.length === 0) {
+                scoreDisplay.innerHTML = 'winner';
+                clearInterval(timerId);
+                document.removeEventListener('keydown', moveUser);
+            }
+
+        }
+    }
+
+    if (ballCurrentPosition[0] >= (boardWidth - ballDia) || 
+    ballCurrentPosition[1] >= (boardHeight - ballDia) || 
+    ballCurrentPosition[0] <= 0) {
+        changeDirection();
+    }
+
+    if ( 
+        (ballCurrentPosition[0] > currentPosition[0] && ballCurrentPosition[0] < currentPosition[0] + blockWidth) &&
+        (ballCurrentPosition[1] > currentPosition[1] && ballCurrentPosition[1] < currentPosition[1] + blockHeight)
+    ) { changeDirection();
+    }
+
+
+
+
+    if (ballCurrentPosition[1] <= 0) {
+        clearInterval(timerId);
+        scoreDisplay.innerHTML = 'you lose';
+        document.removeEventListener('keydown', moveUser);
+    
+    }
+}
+
+
+
+function changeDirection() {
+    if (xDirection === 2 && yDirection === 2) {
+        yDirection = -2;
+        return;
+    } if (xDirection === 2 && yDirection === -2) {
+        xDirection = -2;
+        return;
+    } if (xDirection === -2 && yDirection === -2) {
+        yDirection = 2;
+        return;
+    } if (xDirection === -2 && yDirection === 2) {
+        xDirection = 2;
+        return;
+    }
+}
