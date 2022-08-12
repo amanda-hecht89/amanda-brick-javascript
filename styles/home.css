@@ -27,3 +27,24 @@
     border-radius: 10px;
     background-color: dodgerblue;
 }
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.start {
+    border: 3px solid darkorange;
+    font-size: 25px;
+    width: 25%;
+}
+
+.score {
+    font-size: 25px;
+}
+
+p {
+    font-size: 25px;
+}
+
