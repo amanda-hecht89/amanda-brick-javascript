@@ -9,12 +9,18 @@ let xDirection = 2;
 const boardHeight = 300;
 const scoreDisplay = document.querySelector('.score');
 let score = 0;
+const startGame = document.querySelector('.start');
 
 const userStart = [230, 10];
 let currentPosition = userStart;
 
 const ballStart = [270, 40];
 let ballCurrentPosition = ballStart;
+
+startGame.addEventListener('click', () => {
+    window.location.reload();
+
+});
 
 
 
